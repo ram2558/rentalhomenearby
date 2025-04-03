@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Rental Home Application</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Rental Home App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="#" data-toggle="modal" data-target="#ownerModal">Register as Owner</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" data-toggle="modal" data-target="#tenantModal">Register as Tenant</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h1 class="text-center">Find Your Dream Home</h1>
+        <input type="text" id="search" class="form-control mb-3" placeholder="Search by location or rent...">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="preference" id="all" value="all" checked>
+            <label class="form-check-label" for="all">All</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="preference" id="bachelor" value="bachelor">
+            <label class="form-check-label" for="bachelor">Bachelors</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="preference" id="family" value="family">
+            <label class="form-check-label" for="family">Family</label>
+        </div>
+        <div id="housesList"></div>
+    </div>
+    <!-- Owner Registration Modal -->
+    <div class="modal fade" id="ownerModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">House Owner Registration</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="ownerForm">
+                        <input type="text" class="form-control mb-2" id="ownerName" placeholder="Name" required>
+                        <input type="text" class="form-control mb-2" id="houseLocation" placeholder="House Location" required>
+                        <input type="number" class="form-control mb-2" id="rentAmount" placeholder="Rent Amount" required>
+                        <select class="form-control mb-2" id="houseType">
+                            <option value="">Select House Type</option>
+                            <option value="1BHK">1 BHK</option>
+                            <option value="2BHK">2 BHK</option>
+                            <option value="3BHK">3 BHK</option>
+                        </select>
+                        <select class="form-control mb-2" id="preference">
+                            <option value="both">Both Bachelors and Family</option>
+                            <option value="bachelor">Only Bachelors</option>
+                            <option value="family">Only Family</option>
+                        </select>
+                        <input type="tel" class="form-control mb-2" id="ownerPhone" placeholder="Phone Number" required>
+                        <button type="submit" class="btn btn-success btn-block">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tenant Registration Modal -->
+    <div class="modal fade" id="tenantModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tenant Registration</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="tenantForm">
+                        <input type="text" class="form-control mb-2" id="tenantName" placeholder="Name" required>
+                        <input type="email" class="form-control mb-2" id="tenantEmail" placeholder="Email" required>
+                        <input type="tel" class="form-control mb-2" id="tenantPhone" placeholder="Phone Number" required>
+                        <select class="form-control mb-2" id="tenantType">
+                            <option value="bachelor">Bachelor</option>
+                            <option value="family">Family</option>
+                        </select>
+                        <button type="submit" class="btn btn-success btn-block">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Message Modal -->
+    <div class="modal fade" id="messageModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Send Message to Owner</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="messageForm">
+                        <textarea class="form-control mb-2" id="message" placeholder="Message" required></textarea>
+                        <button type="submit" class="btn btn-success btn-block">Send</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function displayHouses() {
+                var houses = JSON.parse(localStorage.getItem('houses')) || [];
+                var preference = $('input[name="preference"]:checked').val();
+                if (preference === 'all') {
+                    houses = houses;
+                } else if (preference === 'bachelor') {
+                    houses = houses.filter(house => house.preference === 'bachelor' || house.preference === 'both');
+                } else if (preference === 'family') {
+                    houses = houses.filter(house => house.preference === 'family' || house.preference === 'both');
+                }
+                var searchValue = $('#search').val().toLowerCase();
+                houses = houses.filter(house => Object.values(house).some(value => String(value).toLowerCase().includes(searchValue)));
+                var html = houses.map((house, index) => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${house.ownerName}</h5>
+                            <p>Location: ${house.houseLocation} | Rent: $${house.rentAmount} | Type: ${house.houseType}</p>
+                            <p>Preference: ${house.preference === 'both' ? 'Both Bachelors and Family' : house.preference === 'bachelor' ? 'Only Bachelors' : 'Only Family'}</p>
+                            <p>Phone: ${house.ownerPhone}</p>
+                            <button class="btn btn-warning edit-house" data-index="${index}">Edit</button>
+                            <button class="btn btn-danger delete-house" data-index="${index}">Delete</button>
+                            <button class="btn btn-primary message-owner" data-index="${index}">Message Owner</button>
+                        </div>
+                    </div>
+                `).join('');
+                $('#housesList').html(html);
+            }
+
+            $('#ownerForm').submit(function(e) {
+                e.preventDefault();
+                var houseData = {
+                    ownerName: $('#ownerName').val(),
+                    houseLocation: $('#houseLocation').val(),
+                    rentAmount: $('#rentAmount').val(),
+                    houseType: $('#houseType').val(),
+                    preference: $('#preference').val(),
+                    ownerPhone: $('#ownerPhone').val()
+                };
+                var houses = JSON.parse(localStorage.getItem('houses')) || [];
+                houses.push(houseData);
+                localStorage.setItem('houses', JSON.stringify(houses));
+                displayHouses();
+                $('#ownerModal').modal('hide');
+            });
+
+            $(document).on('click', '.delete-house', function() {
+                var index = $(this).data('index');
+                var houses = JSON.parse(localStorage.getItem('houses'));
+                houses.splice(index, 1);
+                localStorage.setItem('houses', JSON.stringify(houses));
+                displayHouses();
+            });
+
+            $(document).on('click', '.edit-house', function() {
+                var index = $(this).data('index');
+                var houses = JSON.parse(localStorage.getItem('houses'));
+                var house = houses[index];
+                $('#ownerName').val(house.ownerName);
+                $('#houseLocation').val(house.houseLocation);
+                $('#rentAmount').val(house.rentAmount);
+                $('#houseType').val(house.houseType);
+                $('#preference').val(house.preference);
+                $('#ownerPhone').val(house.ownerPhone);
+                $('#ownerForm').submit(function(e) {
+                    e.preventDefault();
+                    houses[index] = {
+                        ownerName: $('#ownerName').val(),
+                        houseLocation: $('#houseLocation').val(),
+                        rentAmount: $('#rentAmount').val(),
+                        houseType: $('#houseType').val(),
+                        preference: $('#preference').val(),
+                        ownerPhone: $('#ownerPhone').val()
+                    };
+                    localStorage.setItem('houses', JSON.stringify(houses));
+                    displayHouses();
+                    $('#ownerModal').modal('hide');
+                });
+                $('#ownerModal').modal('show');
+            });
+
+            $(document).on('click', '.message-owner', function() {
+                var index = $(this).data('index');
+                var houses = JSON.parse(localStorage.getItem('houses'));
+                var house = houses[index];
+                $('#messageForm').submit(function(e) {
+                    e.preventDefault();
+                    var message = $('#message').val();
+                    console.log(`Message to ${house.ownerName}: ${message}`);
+                    $('#messageModal').modal('hide');
+                });
+                $('#messageModal').modal('show');
+            });
+
+            $('#search').on('input', displayHouses);
+            $('input[name="preference"]').on('change', displayHouses);
+
+            displayHouses();
+        });
+    </script>
+</body>
+</html>
