@@ -23,7 +23,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" href="#">Rental Home App</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -62,7 +62,7 @@
                     <form id="ownerForm">
                         <input type="text" class="form-control mb-2" id="ownerName" placeholder="Name" required>
                         <input type="text" class="form-control mb-2" id="houseLocation" placeholder="House Location" required>
-                        <input type="number" class="form-control mb-2" id="rentAmount" placeholder="Rent Amount" required>
+                        <input type="number" class="form-control mb-2" id="rentAmount" placeholder="Rent Amount (INR)" required>
                         <select class="form-control mb-2" id="houseType">
                             <option value="">Select House Type</option>
                             <option value="1BHK">1 BHK</option>
@@ -137,19 +137,21 @@
                 }
                 var searchValue = $('#search').val().toLowerCase();
                 houses = houses.filter(house => Object.values(house).some(value => String(value).toLowerCase().includes(searchValue)));
-                var html = houses.map((house, index) => `
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">${house.ownerName}</h5>
-                            <p>Location: ${house.houseLocation} | Rent: $${house.rentAmount} | Type: ${house.houseType}</p>
-                            <p>Preference: ${house.preference === 'both' ? 'Both Bachelors and Family' : house.preference === 'bachelor' ? 'Only Bachelors' : 'Only Family'}</p>
-                            <p>Phone: ${house.ownerPhone}</p>
-                            <button class="btn btn-warning edit-house" data-index="${index}">Edit</button>
-                            <button class="btn btn-danger delete-house" data-index="${index}">Delete</button>
-                            <button class="btn btn-primary message-owner" data-index="${index}">Message Owner</button>
+                var html = houses.map((house, index) => {
+                    return `
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">${house.ownerName}</h5>
+                                <p>Location: ${house.houseLocation} | Rent: ₹${house.rentAmount} | Type: ${house.houseType}</p>
+                                <p>Preference: ${house.preference === 'both' ? 'Both Bachelors and Family' : house.preference === 'bachelor' ? 'Only Bachelors' : 'Only Family'}</p>
+                                <p>Phone: ${house.ownerPhone}</p>
+                                <button class="btn btn-warning edit-house" data-index="${index}">Edit</button>
+                                <button class="btn btn-danger delete-house" data-index="${index}">Delete</button>
+                                <button class="btn btn-primary message-owner" data-index="${index}">Message Owner</button>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 $('#housesList').html(html);
             }
 
